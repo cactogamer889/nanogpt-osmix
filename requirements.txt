@@ -1,0 +1,26 @@
+# Osmix API and Training Dependencies
+
+# API Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Machine Learning
+torch>=2.0.0
+numpy>=1.24.0
+transformers>=4.35.0
+datasets>=2.14.0
+tiktoken>=0.5.0
+
+# Model Saving Formats
+safetensors>=0.4.0
+onnx>=1.15.0
+onnxruntime>=1.16.0
+
+# Utilities
+tqdm>=4.66.0
+wandb>=0.16.0
+
+# Optional but recommended
+accelerate>=0.25.0
+bitsandbytes>=0.41.0

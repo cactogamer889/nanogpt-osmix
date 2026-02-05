@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Osmix - AI Training Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Title Bar -->
+    <div class="title-bar">
+        <div class="title-bar-drag">
+            <span class="app-title">Osmix</span>
+        </div>
+        <div class="title-bar-controls">
+            <button class="title-bar-btn" onclick="window.electronAPI.minimizeWindow()">−</button>
+            <button class="title-bar-btn" onclick="window.electronAPI.maximizeWindow()">□</button>
+            <button class="title-bar-btn close-btn" onclick="window.electronAPI.closeWindow()">×</button>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Osmix</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <button class="nav-main-button" onclick="showSection('train-section')" id="btn-train">Train</button>
+                    <div id="train-categories"></div>
+                </div>
+                <div class="nav-section">
+                    <button class="nav-main-button" onclick="showSection('check-params-section')" id="btn-check-params">Check Params</button>
+                </div>
+                <div class="nav-section">
+                    <button class="nav-main-button" onclick="showSection('retrain-section')" id="btn-retrain">Retrain Models</button>
+                </div>
+                <div class="nav-section">
+                    <button class="nav-main-button" disabled style="opacity: 0.6; cursor: not-allowed;">Fine-tuning</button>
+                    <span class="coming-soon">Em breve</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Train Section -->
+            <section id="train-section" class="content-section active">
+                <h2>Training Configuration</h2>
+                <div id="train-content">
+                    <p>Select a category and subcategory from the sidebar to start training.</p>
+                </div>
+            </section>
+
+            <!-- Check Params Section -->
+            <section id="check-params-section" class="content-section">
+                <h2>Check Model Parameters</h2>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="model-path">Model Path:</label>
+                        <input type="text" id="model-path" placeholder="product/models/model_name.ckpt ou .pth ou .safetensors etc">
+                        <small style="color: #666; font-size: 12px;">Use o nome do modelo com a extensão (.ckpt, .pth, .safetensors, .onnx, etc.)</small>
+                    </div>
+                    <button onclick="checkParams()" class="btn btn-primary">Check Parameters</button>
+                    <div id="params-result" class="result-container"></div>
+                </div>
+            </section>
+
+            <!-- Retrain Section -->
+            <section id="retrain-section" class="content-section">
+                <h2>Retrain Model</h2>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="retrain-model-path">Model Path:</label>
+                        <input type="text" id="retrain-model-path" placeholder="product/models/model_name.ckpt ou .pth ou .safetensors etc">
+                        <small style="color: #666; font-size: 12px;">Use o nome do modelo com a extensão (.ckpt, .pth, .safetensors, .onnx, etc.)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="retrain-category">Category:</label>
+                        <select id="retrain-category"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="retrain-subcategory">Subcategory:</label>
+                        <select id="retrain-subcategory"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="additional-iters">Additional Iterations:</label>
+                        <input type="number" id="additional-iters" value="10000">
+                    </div>
+                    <button onclick="retrainModel()" class="btn btn-primary">Start Retraining</button>
+                    <div id="retrain-result" class="result-container"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Training Config Modal -->
+    <div id="config-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeConfigModal()">&times;</span>
+            <h2>Training Configuration</h2>
+            <form id="training-config-form">
+                <div class="form-group">
+                    <label for="config-model-name">Model Name:</label>
+                    <input type="text" id="config-model-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-batch-size">Batch Size:</label>
+                    <input type="number" id="config-batch-size" value="12" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-block-size">Block Size:</label>
+                    <input type="number" id="config-block-size" value="1024" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-gradient-accumulation">Gradient Accumulation Steps:</label>
+                    <input type="number" id="config-gradient-accumulation" value="5" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-learning-rate">Learning Rate:</label>
+                    <input type="number" id="config-learning-rate" value="0.0006" step="0.0001" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-max-iters">Max Iterations:</label>
+                    <input type="number" id="config-max-iters" value="600000" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-n-layer">Number of Layers:</label>
+                    <input type="number" id="config-n-layer" value="12" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-n-head">Number of Attention Heads:</label>
+                    <input type="number" id="config-n-head" value="12" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-n-embd">Embedding Dimension:</label>
+                    <input type="number" id="config-n-embd" value="768" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-dropout">Dropout:</label>
+                    <input type="number" id="config-dropout" value="0.0" step="0.1" min="0" max="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="config-output-format">Output Format:</label>
+                    <select id="config-output-format" required>
+                        <option value="ckpt">CKPT</option>
+                        <option value="pth">PTH</option>
+                        <option value="safetensors">SafeTensors</option>
+                        <option value="onnx">ONNX</option>
+                        <option value="ggml">GGML</option>
+                        <option value="gguf">GGUF</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="config-device">Device:</label>
+                    <select id="config-device" required>
+                        <option value="cuda">CUDA</option>
+                        <option value="cpu">CPU</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="config-dtype">Data Type:</label>
+                    <select id="config-dtype" required>
+                        <option value="bfloat16">BFloat16</option>
+                        <option value="float16">Float16</option>
+                        <option value="float32">Float32</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="config-save-interval">Save Checkpoint Every N Iterations:</label>
+                    <input type="number" id="config-save-interval" value="1000" min="1" required>
+                    <small style="color: #666; font-size: 12px;">Model will be saved periodically during training</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Start Training</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Check if Electron API is available
+        if (typeof window.electronAPI === 'undefined') {
+            console.warn('Electron API not available. Running in browser mode.');
+            // Fallback for browser testing
+            window.electronAPI = {
+                getCategories: async () => ({ success: false, error: 'Not in Electron' }),
+                getCategoryStatus: async () => ({ success: false, error: 'Not in Electron' }),
+                checkDataset: async () => ({ success: false, error: 'Not in Electron' }),
+                startTraining: async () => ({ success: false, error: 'Not in Electron' }),
+                checkParams: async () => ({ success: false, error: 'Not in Electron' }),
+                retrainModel: async () => ({ success: false, error: 'Not in Electron' }),
+                getModels: async () => ({ success: false, error: 'Not in Electron' }),
+                minimizeWindow: () => {},
+                maximizeWindow: () => {},
+                closeWindow: () => {}
+            };
+        }
+    </script>
+</body>
+</html>
